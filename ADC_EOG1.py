@@ -1,19 +1,21 @@
 from ADC_EOG1_functions import *
-#########
-####################
-#BEGIN STUDENT PART#########
-#####################################
+
+#################################################
+# acquire baseline to subtract from samples #################
+##############################################################################
+baseline=ads.readADCSingleEnded()
+print("{:.0f} mV bsl".format(baseline))
+
 #################################################
 # start recording! ##########################################
 ##############################################################################
-
 print('start rec')
 time1=int(round(time.time()*1000))        #save start time in variable 'time1'
 t_start=pi.get_current_tick() #hardware time
 
 while True:
     #read in a sample
-    sample=ads.readADCSingleEnded()
+    sample=ads.readADCSingleEnded()-baseline
 #     print("{:.0f} mV mesuré sur AN0".format(sample))
     
     #append sample to trace and check if the threshold was crossed
@@ -54,12 +56,12 @@ while True:
         xi = time_rec.copy()-t_start
         yii=trigger_rec.copy()*10000
         yiii=(time_rec.copy()-t_start)/(pi.get_current_tick()-t_start)*(threshold+300-threshold-200)+threshold-200
-        plt.ylim(threshold-200, threshold+300)
+        plt.ylim(threshold-300, threshold+600)
         plt.plot(xi, yi, linewidth=1, color='royalblue')
         plt.plot(xi, yii, linewidth=1, color='black')
-        plt.plot(xi, yiii, linewidth=1, color='green')
-        print('reaction time to first target')
-#         print(pigpio.tickDiff(t1, t2))
+#         plt.plot(xi, yiii, linewidth=1, color='green')
+        print('reaction time to first target in microseconds')
+        print(pigpio.tickDiff(t1, t2))
         print('done')
         plt.show()
         break
