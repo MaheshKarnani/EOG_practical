@@ -3,7 +3,7 @@ from ADC_EOG1_functions import *
 #################################################
 # acquire baseline to subtract from samples #################
 ##############################################################################
-baseline=ads.readADCSingleEnded()
+baseline=ads.readADCSingleEnded(pga=6144,sps=860)
 print("{:.0f} mV bsl".format(baseline))
 
 #################################################
@@ -15,8 +15,7 @@ t_start=pi.get_current_tick() #hardware time
 
 while True:
     #read in a sample
-    sample=ads.readADCSingleEnded()-baseline
-#     print("{:.0f} mV mesuré sur AN0".format(sample))
+    sample=ads.readADCSingleEnded(pga=6144,sps=860)-baseline
     
     #append sample to trace and check if the threshold was crossed
     if not stop_flag:                          
@@ -51,6 +50,7 @@ while True:
     #########################################
     #recording over, plot the result!
     if not stop_flag and timer1>recording_length*1000:
+        pi.write(led1, 0) 
         stop_flag=True
         yi = recording.copy()
         xi = time_rec.copy()-t_start
@@ -61,7 +61,7 @@ while True:
         plt.plot(xi, yii, linewidth=1, color='black')
 #         plt.plot(xi, yiii, linewidth=1, color='green')
         print('reaction time to first target in microseconds')
-        print(pigpio.tickDiff(t1, t2))
+#         print(pigpio.tickDiff(t1, t2))
         print('done')
         plt.show()
         break
